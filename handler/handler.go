@@ -61,7 +61,7 @@ func getClient(cnpj string) (*domain.Cliente, error) {
 func HandleRamais(c *fiber.Ctx) error {
 
 	cnpj := c.Params("cnpj")
-	fmt.Println(cnpj)
+
 	newCliente, err := getClient(cnpj)
 	if err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
