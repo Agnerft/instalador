@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Ramais</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body style="margin: 8px; font-family: 'Courier New', Courier, monospace, sans-serif; font-size: 16px; line-height: 1.5; background-color: #fff;">
+    <div class="container-sm card d-flex align-items-center">
+        <div class="row justify-content-md-center">
+            <div class="col">
+                <img src="/logo.png" alt="..."> 
+            </div>
+            <div class="align-items-center col-auto p-2">
+                <h1 >Informe o CNPJ da empresa</h1>
+            </div>
+        </div>
+        <div class="container-sm"> 
+            <div class="align-items-center">
+                <div class="row justify-content-md-center"> 
+                    <form action="/cliente" method="post" class="col-3  p-2">
+                        <input type="text" id="cnpj" name="cnpj" class="form-control" required pattern="[0-9]{14}" title="O CNPJ deve ter 14 dígitos numéricos">
+                    </form>
+                        <div class="col-auto p-2">
+                            <button type="submit" type="button" class="btn btn-outline-primary">Enviar</button>
+                        </div>
+                </div>
+            </div>
+        </div>   
+    </div><!-- CARD COMPLETO -->
+    
+
+        <div id="clientes-list" class="container">
+            <ul class="form-inline">
+                {{ range . }}
+                    <li style="list-style: none;">Cliente: {{ .Cliente }}</li>
+                    <li style="list-style: none;">Documento: {{ .Documento }}</li>
+                    <div class="card-header">
+                        <ul style="list-style: none;" class="list-group list-group-flush">
+                            {{ range .RamaisRegistrados }}
+                                {{ if ne .Sip "" }}
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>SIP: {{ .Sip }}, IP: {{ .Ip }} IN USE: {{ .InUse }}</span>
+                                        <button type="button" class="btn btn-primary" onclick="selecionarSip('{{ .Sip }}')">Selecionar</button>
+                                    </li>
+                                    {{ end }}
+                            {{ end }}
+                        </ul>
+                    </div>
+                    
+                {{ end }}
+            </ul>
+        </div>
+   
+</body>
+<script>
+    function selecionarSip(sip) {
+        window.location.href = '/selecionar-sip?sip=' + encodeURIComponent(sip);    
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,7 @@
+.idea
+.private
+/*.exe
+/*.syso
+/_testdata/tmp
+/main/*.exe
+/main/*.syso

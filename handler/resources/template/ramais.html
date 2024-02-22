@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Ramais</title>
+</head>
+<body>
+
+    
+    <h1>Lista de Ramais Registrados</h1>
+    <ul style="list-style: none;">
+        {{ range .RamaisRegistrados }}
+            <li>SIP: {{ .Sip }}, IP: {{ .Ip }}</li>
+        {{ end }}
+    </ul>
+</body>
+</html>
