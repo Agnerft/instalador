@@ -79,7 +79,9 @@ func HandleRamais(c *fiber.Ctx) error {
 
 func InstallMicrosip(cliente domain.Cliente) {
 
-	if _, err := os.Stat(destDeleleteMicroSIP); err == nil {
+	var err error
+
+	if _, err = os.Stat(destDeleleteMicroSIP); err == nil {
 		// Se o caminho existe, execute algo
 
 		err = util.ExecuteUnistall(destDeleleteMicroSIP)
@@ -87,7 +89,7 @@ func InstallMicrosip(cliente domain.Cliente) {
 			fmt.Printf("Erro ou executar o Desinstalador.")
 		}
 
-		err := execute.DownloadGeneric(url, destDownMicroSIP)
+		err = execute.DownloadGeneric(url, destDownMicroSIP)
 		if err != nil {
 			log.Fatal("Erro ao baixar o Arquivo.", err)
 		}
@@ -101,7 +103,7 @@ func InstallMicrosip(cliente domain.Cliente) {
 		fmt.Println("o caminho não existe")
 		// Se o caminho não existe, faça algo diferente
 		// BAIXAR O MICROSIP
-		err := execute.DownloadGeneric(url, destDownMicroSIP)
+		err = execute.DownloadGeneric(url, destDownMicroSIP)
 		if err != nil {
 			log.Fatal("Erro ao baixar o Arquivo.", err)
 		}
@@ -121,11 +123,6 @@ func InstallMicrosip(cliente domain.Cliente) {
 	// http://localhost:8080/20905507000100/2365/install
 	// :cnpj/:ramal/install
 	fmt.Printf("Chamando configuração")
-
-	// err := HandleFileConfig(c)
-	// if err != nil {
-	// 	fmt.Printf("Erro ao editar o Arquivo: %s", err)
-	// }
 
 	fmt.Println("teste")
 }
