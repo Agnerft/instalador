@@ -12,34 +12,13 @@ import (
 
 // var UsrCurr *user.User
 
-func ExecuteUnistall(filePath string) error {
-	// C:\Users\USER\AppData\Local\MicroSIP\Uninstall.exe
-
-	// filePath := filepath.Join(UserCurrent().HomeDir,
-	// 	"AppData",
-	// 	"Local",
-	// 	"MicroSIP",
-	// 	"Uninstall.exe")
+func Executable(filePath string) error {
 
 	cmd := exec.Command(filePath, "/S")
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("Erro ao executar o desinstalador: %s \n", err)
 		return err
+
 	}
-
-	fmt.Println("Removido")
-
-	return nil
-}
-
-func ExecuteInstall(filePath string) error {
-	cmd := exec.Command(filePath, "/S")
-	if err := cmd.Run(); err != nil {
-		fmt.Printf("Erro ao executar o desinstalador: %s \n", err)
-		return err
-	}
-
-	fmt.Println("Instalado")
 
 	return nil
 }

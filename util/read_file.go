@@ -3,10 +3,12 @@ package util
 import (
 	"bufio"
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+	"unicode/utf16"
 )
 
 // func ReadFile(filePath, novoValor string, numeroLinha int) error {
@@ -56,30 +58,28 @@ import (
 // 	return nil
 // }
 
-func ReadFile(filePath, oldText, newText string, position int) error {
-	data, err := os.ReadFile(filePath)
+func ReadFile(filePath string) (string, error) {
+	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {
-		panic(err)
-
+		log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
+		return "", err
 	}
 
-	// SEGUE
+	defer file.Close()
 
-	teste := strings.Split(string(data), "\n")
-
-	if string(teste[position]) == oldText {
-
-		txt := strings.Replace(string(data), oldText, newText, 1)
-		err = os.WriteFile(filePath, []byte(txt), 0755)
-		if err != nil {
-			panic(err)
-
-		}
-	} else {
-		fmt.Printf("O texto que está no %s é igual ao %s, por isso não precisa gravar.\n", teste[position], newText)
+	info, err := file.Stat()
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	content := make([]byte, info.Size())
+
+	_, err = file.Read(content)
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), err
 
 }
 
@@ -103,22 +103,16 @@ func contarLinhasNoConteudo(data []byte) (int, error) {
 
 func AdicionarConfiguracao(destFile string) error {
 	// Abrir o arquivo em modo de escrita, criando-o se não existir
-	// file, err := os.OpenFile(destFile, os.O_RDWR|os.O_APPEND, 0644)
-	// if err != nil {
-	// 	log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
-	// 	return err
-	// }
-
-	// defer file.Close()
-
-	data, err := os.ReadFile(destFile)
+	file, err := os.OpenFile(destFile, os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {
-		panic(err)
-
+		log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
+		return err
 	}
 
+	defer file.Close()
+
 	// Conteúdo a ser adicionado
-	novoConteudo := `[Account1]
+	novoConteudo := []rune(`[Account1]
 label=
 server=
 proxy=
@@ -140,31 +134,31 @@ publish=0
 ICE=0
 allowRewrite=0
 disableSessionTimer=0
-`
+`)
+	utf := utf16.Encode(novoConteudo)
+	// binary.Write(file, binary.LittleEndian, uint16(0xFEFF))
 
-	_, numeroLinhas, err := fileForByte(destFile)
+	_, numeroLinhas, err := FileForByte(destFile)
 	if err != nil {
 		log.Fatal("Erro para modificar o arquivo para Byte.", err)
 		return err
 	}
 
 	if numeroLinhas <= 106 {
-		// Add novo conteudo
-		data = append(data, []byte(novoConteudo)...)
-		// Escrever o novo conteúdo no arquivo
-		err = os.WriteFile(destFile, data, 0755)
-		if err != nil {
-			panic(err)
+
+		for _, u := range utf {
+			binary.Write(file, binary.LittleEndian, u)
 		}
 
 	} else {
 		fmt.Println("Não precisa add o arquivo")
+		return nil
 	}
 
 	return nil
 }
 
-func fileForByte(destFile string) ([]byte, int, error) {
+func FileForByte(destFile string) ([]byte, int, error) {
 
 	// Abrir o arquivo em modo de escrita, criando-o se não existir
 	file, err := os.OpenFile(destFile, os.O_RDWR|os.O_APPEND, 0644)
@@ -186,9 +180,6 @@ func fileForByte(destFile string) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
-	// Imprima o conteúdo lido
-	// fmt.Printf("Conteúdo do arquivo:\n%s\n", data[:n])
-
 	// Contar as linhas no conteúdo
 	numLinhas, _ := contarLinhasNoConteudo(data[:n])
 
@@ -197,4 +188,43 @@ func fileForByte(destFile string) ([]byte, int, error) {
 	fmt.Printf("Número de linhas no conteúdo do arquivo: %d\n", numLinhas)
 
 	return data, numLinhas, nil
+}
+
+func ReplaceLineOfFile(filepath, textSearch, newText string) error {
+
+	file, err := os.OpenFile(filepath, os.O_RDWR, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	tempFile, err := os.CreateTemp("", "tempfile")
+	if err != nil {
+		return err
+	}
+
+	defer tempFile.Close()
+
+	scanner := bufio.NewScanner(file)
+	writer := bufio.NewWriter(tempFile)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, textSearch) {
+			line = strings.Replace(line, textSearch, newText, -1)
+		}
+		fmt.Fprintln(writer, line)
+	}
+
+	err = scanner.Err()
+	if err != nil {
+		return err
+	}
+
+	writer.Flush()
+
+	err = os.Rename(tempFile.Name(), filepath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
