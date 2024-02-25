@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitRouter() {
+func InitRouter() error {
 	app := fiber.New(fiber.Config{})
 
 	app.Get("/:cnpj", handler.HandleClient)
@@ -17,7 +17,7 @@ func InitRouter() {
 	err := app.Listen("0.0.0.0:8080")
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
-
+	return nil
 }

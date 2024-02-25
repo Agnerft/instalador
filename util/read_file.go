@@ -58,30 +58,30 @@ import (
 // 	return nil
 // }
 
-func ReadFile(filePath string) (string, error) {
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
-		return "", err
-	}
+// func ReadFile(filePath string) (string, error) {
+// 	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_APPEND, 0644)
+// 	if err != nil {
+// 		log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
+// 		return "", err
+// 	}
 
-	defer file.Close()
+// 	defer file.Close()
 
-	info, err := file.Stat()
-	if err != nil {
-		return "", err
-	}
+// 	info, err := file.Stat()
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	content := make([]byte, info.Size())
+// 	content := make([]byte, info.Size())
 
-	_, err = file.Read(content)
-	if err != nil {
-		return "", err
-	}
+// 	_, err = file.Read(content)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	return string(content), err
+// 	return string(content), err
 
-}
+// }
 
 func contarLinhasNoConteudo(data []byte) (int, error) {
 	// Inicializar o contador de linhas
@@ -106,7 +106,7 @@ func AdicionarConfiguracao(destFile string) error {
 	file, err := os.OpenFile(destFile, os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
-		return nil, err
+		return err
 	}
 
 	// Conteúdo a ser adicionado
@@ -215,21 +215,18 @@ func ReplaceLineOfFile(filepath, textSearch, newText string) error {
 	return nil
 }
 
-// readUTF16LE lê o conteúdo de um arquivo UTF-16 LE.
 func readUTF16LE(file *os.File) ([]uint16, error) {
-	// Lê o BOM (Byte Order Mark) para determinar a ordem de bytes.
+
 	bom := make([]byte, 2)
 	_, err := file.Read(bom)
 	if err != nil {
 		return nil, err
 	}
 
-	// Verifica se o arquivo tem a marca de ordem de bytes correta.
 	if bom[0] != 0xFF || bom[1] != 0xFE {
 		return nil, fmt.Errorf("arquivo não está em formato UTF-16 LE")
 	}
 
-	// Lê o conteúdo do arquivo como runes UTF-16.
 	var buffer []uint16
 	for {
 		var u uint16
@@ -243,16 +240,13 @@ func readUTF16LE(file *os.File) ([]uint16, error) {
 	return buffer, nil
 }
 
-// writeUTF16LE escreve o conteúdo no arquivo usando UTF-16 LE.
 func writeUTF16LE(file *os.File, content string) {
-	// Escreve o BOM (Byte Order Mark) para indicar UTF-16 LE.
+
 	bom := []byte{0xFF, 0xFE}
 	file.Write(bom)
 
-	// Converte a string para runes UTF-16.
 	runes := utf16.Encode([]rune(content))
 
-	// Escreve os runes no arquivo usando ordem de bytes little-endian.
 	for _, u := range runes {
 		binary.Write(file, binary.LittleEndian, u)
 	}

@@ -2,16 +2,14 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 
-	"github.com/agnerft/ListRamais/util"
+	"github.com/agnerft/ListRamais/router"
 )
 
 func main() {
-	destFileConfigMicrosip := filepath.Join(util.UserCurrent().HomeDir, "AppData", "Roaming", "MicroSIP", "microsip.ini")
-	err := util.ReplaceLineOfFile(destFileConfigMicrosip, "accountId=0", "accountId=1")
-	if err != nil {
-		fmt.Println("Deu erro")
-	}
 
+	err := router.InitRouter()
+	if err != nil {
+		fmt.Println("Erro ai inicializar o InitRouter")
+	}
 }
