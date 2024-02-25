@@ -1,6 +1,6 @@
 module github.com/agnerft/ListRamais
 
-go 1.21.1
+go 1.20
 
 require (
 	github.com/cavaliergopher/grab/v3 v3.0.1

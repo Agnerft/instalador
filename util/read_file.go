@@ -102,14 +102,12 @@ func contarLinhasNoConteudo(data []byte) (int, error) {
 }
 
 func AdicionarConfiguracao(destFile string) error {
-	// Abrir o arquivo em modo de escrita, criando-o se não existir
+
 	file, err := os.OpenFile(destFile, os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatalf("Erro ao ler o conteúdo do arquivo 2: %v", err)
-		return err
+		return nil, err
 	}
-
-	defer file.Close()
 
 	// Conteúdo a ser adicionado
 	novoConteudo := []rune(`[Account1]
@@ -191,40 +189,71 @@ func FileForByte(destFile string) ([]byte, int, error) {
 }
 
 func ReplaceLineOfFile(filepath, textSearch, newText string) error {
-
-	file, err := os.OpenFile(filepath, os.O_RDWR, os.ModePerm)
+	// Abrir o arquivo para leitura e escrita
+	file, err := os.OpenFile(filepath, os.O_RDWR, 0644)
 	if err != nil {
+		fmt.Println("Erro ao abrir arquivo:", err)
 		return err
 	}
+	defer file.Close()
 
-	tempFile, err := os.CreateTemp("", "tempfile")
+	file16utf, err := readUTF16LE(file)
 	if err != nil {
-		return err
+		fmt.Println("Erro ao ler o file Utf")
 	}
 
-	defer tempFile.Close()
+	// Substituir a palavra alvo pela palavra substituta
+	conteudoModificado := strings.ReplaceAll(string(utf16.Decode(file16utf)), textSearch, newText)
 
-	scanner := bufio.NewScanner(file)
-	writer := bufio.NewWriter(tempFile)
+	// Truncar o arquivo para o tamanho do novo conteúdo
+	file.Truncate(0)
+	file.Seek(0, 0)
+	fmt.Println(conteudoModificado)
+	writeUTF16LE(file, conteudoModificado)
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, textSearch) {
-			line = strings.Replace(line, textSearch, newText, -1)
-		}
-		fmt.Fprintln(writer, line)
-	}
-
-	err = scanner.Err()
-	if err != nil {
-		return err
-	}
-
-	writer.Flush()
-
-	err = os.Rename(tempFile.Name(), filepath)
-	if err != nil {
-		return err
-	}
+	fmt.Println("Substituição concluída com sucesso no arquivo:", filepath)
 	return nil
+}
+
+// readUTF16LE lê o conteúdo de um arquivo UTF-16 LE.
+func readUTF16LE(file *os.File) ([]uint16, error) {
+	// Lê o BOM (Byte Order Mark) para determinar a ordem de bytes.
+	bom := make([]byte, 2)
+	_, err := file.Read(bom)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verifica se o arquivo tem a marca de ordem de bytes correta.
+	if bom[0] != 0xFF || bom[1] != 0xFE {
+		return nil, fmt.Errorf("arquivo não está em formato UTF-16 LE")
+	}
+
+	// Lê o conteúdo do arquivo como runes UTF-16.
+	var buffer []uint16
+	for {
+		var u uint16
+		err := binary.Read(file, binary.LittleEndian, &u)
+		if err != nil {
+			break
+		}
+		buffer = append(buffer, u)
+	}
+
+	return buffer, nil
+}
+
+// writeUTF16LE escreve o conteúdo no arquivo usando UTF-16 LE.
+func writeUTF16LE(file *os.File, content string) {
+	// Escreve o BOM (Byte Order Mark) para indicar UTF-16 LE.
+	bom := []byte{0xFF, 0xFE}
+	file.Write(bom)
+
+	// Converte a string para runes UTF-16.
+	runes := utf16.Encode([]rune(content))
+
+	// Escreve os runes no arquivo usando ordem de bytes little-endian.
+	for _, u := range runes {
+		binary.Write(file, binary.LittleEndian, u)
+	}
 }
