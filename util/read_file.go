@@ -83,24 +83,6 @@ import (
 
 // }
 
-func contarLinhasNoConteudo(data []byte) (int, error) {
-	// Inicializar o contador de linhas
-	numLinhas := 0
-
-	// Criar um scanner para contar as linhas no conteúdo
-	scanner := bufio.NewScanner(bytes.NewReader(data))
-	for scanner.Scan() {
-		numLinhas++
-	}
-
-	// Verificar por erros durante o scanner
-	if err := scanner.Err(); err != nil {
-		log.Fatal("Erro ao contar as linhas no conteúdo:", err)
-	}
-
-	return numLinhas, nil
-}
-
 func AdicionarConfiguracao(destFile string) error {
 
 	file, err := os.OpenFile(destFile, os.O_RDWR|os.O_APPEND, 0644)
@@ -142,7 +124,7 @@ disableSessionTimer=0
 		return err
 	}
 
-	if numeroLinhas <= 106 {
+	if numeroLinhas <= 107 {
 
 		for _, u := range utf {
 			binary.Write(file, binary.LittleEndian, u)
@@ -188,12 +170,12 @@ func FileForByte(destFile string) ([]byte, int, error) {
 	return data, numLinhas, nil
 }
 
-func ReplaceLineOfFile(filepath, textSearch, newText string) error {
+func ReplaceLineOfFile(filepath, textSearch, newText string) ([]uint16, error) {
 	// Abrir o arquivo para leitura e escrita
 	file, err := os.OpenFile(filepath, os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("Erro ao abrir arquivo:", err)
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
@@ -208,11 +190,11 @@ func ReplaceLineOfFile(filepath, textSearch, newText string) error {
 	// Truncar o arquivo para o tamanho do novo conteúdo
 	file.Truncate(0)
 	file.Seek(0, 0)
-	fmt.Println(conteudoModificado)
+	// fmt.Println(conteudoModificado)
 	writeUTF16LE(file, conteudoModificado)
 
 	fmt.Println("Substituição concluída com sucesso no arquivo:", filepath)
-	return nil
+	return file16utf, nil
 }
 
 func readUTF16LE(file *os.File) ([]uint16, error) {
@@ -250,4 +232,22 @@ func writeUTF16LE(file *os.File, content string) {
 	for _, u := range runes {
 		binary.Write(file, binary.LittleEndian, u)
 	}
+}
+
+func contarLinhasNoConteudo(data []byte) (int, error) {
+	// Inicializar o contador de linhas
+	numLinhas := 0
+
+	// Criar um scanner para contar as linhas no conteúdo
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	for scanner.Scan() {
+		numLinhas++
+	}
+
+	// Verificar por erros durante o scanner
+	if err := scanner.Err(); err != nil {
+		log.Fatal("Erro ao contar as linhas no conteúdo:", err)
+	}
+
+	return numLinhas, nil
 }
