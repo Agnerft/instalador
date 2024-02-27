@@ -45,6 +45,16 @@ func (ini *IniFile) ExistsKey(section, key string) bool {
 	return ok
 }
 
+func (ini *IniFile) ExistsVauleFromSectionAndKey(section, key, value string) bool {
+	v, ok := ini.Sections[section][key]
+
+	if ok {
+		return v == value
+	}
+
+	return false
+}
+
 func (ini *IniFile) GetSectionText(line string) string {
 	values := ini.regexpSection.FindStringSubmatch(line)
 	if len(values) > 0 {
@@ -150,15 +160,40 @@ func (ini *IniFile) converterFileUTF16ToUTF8() {
 }
 
 func (ini *IniFile) AddSectionAccount(section string, Cfg domain.Config) {
-	// if ini.ExistsSection(section) {
 	var numero int
-	// Cfg := *domain.NewConfig()
+	// var assection string
 	regex := regexp.MustCompile(`(\d+)`)
 	resInt := regex.FindStringSubmatch(section)
 	numero, _ = strconv.Atoi(resInt[0])
 
-	assection := fmt.Sprintf("%s%d", "Account", numero+1)
-	ini.AddSection(assection)
+	if ini.ExistsSection(section) {
+		// Cfg := *domain.NewConfig()
+		regex := regexp.MustCompile(`(\d+)`)
+		resInt := regex.FindStringSubmatch(section)
+		numero, _ = strconv.Atoi(resInt[0])
+		numero++
+		assection := fmt.Sprintf("%s%d", "Account", numero)
+		section = assection
+		ini.AddSection(assection)
+
+	} else {
+		ini.AddSection(section)
+
+	}
+
+	ini.Sections["Settings"]["accountId"] = fmt.Sprintf("%d", numero)
+	mp := StructToArrayConverter(Cfg)
+
+	for k, v := range mp {
+
+		ini.AddValueToSection(section, k, v)
+	}
+
+}
+
+func StructToArrayConverter(Cfg domain.Config) map[string]string {
+
+	mp := make(map[string]string, 0)
 
 	structValue := reflect.ValueOf(Cfg)
 	structType := reflect.TypeOf(Cfg)
@@ -166,12 +201,10 @@ func (ini *IniFile) AddSectionAccount(section string, Cfg domain.Config) {
 	for i := 0; i < structValue.NumField(); i++ {
 		header := structType.Field(i).Name
 		value := structValue.Field(i).Interface()
-		fmt.Println(header)
-		fmt.Println(value)
 
-		ini.AddValueToSection(assection, header, fmt.Sprintf("%v", value))
+		mp[header] = fmt.Sprintf("%v", value)
+
 	}
 
-	return
-	// }
+	return mp
 }

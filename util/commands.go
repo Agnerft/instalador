@@ -99,5 +99,5 @@ func GetPIDbyName(processName string) (int, error) {
 		}
 	}
 
-	return 0, fmt.Errorf("Processo não encontrado: %s", processName)
+	return 0, err
 }
