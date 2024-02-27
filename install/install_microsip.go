@@ -19,9 +19,10 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	var destFileConfigMicrosip = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Roaming", "MicroSIP", "MicroSIP.ini")
 	var url = "https://www.microsip.org/download/MicroSIP-3.21.3.exe"
 
+	fmt.Println(account)
 	err = util.Executable(destDeleleteMicroSIP)
 	if err != nil {
-		fmt.Printf("Erro ou executar o Desinstalador no caminho: %s.", destDeleleteMicroSIP)
+		fmt.Printf("Erro ou executar o Desinstalador no caminho: %s. \n", destDeleleteMicroSIP)
 	}
 
 	err = execute.DownloadGeneric(url, destDownMicroSIP)
@@ -32,7 +33,7 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 
 	err = util.Executable(destDownMicroSIP)
 	if err != nil {
-		log.Printf("Erro ao instalar o %s", destDownMicroSIP)
+		log.Printf("Erro ao executar o instalador no caminho: %s. \n", destDownMicroSIP)
 	}
 
 	i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))

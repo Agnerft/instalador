@@ -13,7 +13,7 @@ func InitRouter() error {
 
 	app.Get("/:cnpj", handler.HandleClient)
 	app.Get("/:cnpj/ramais", handler.HandleRamais)
-	app.Get("/:cnpj/:ramal/install", handler.HandlerInstall)
+	app.Get("/:cnpj/:ramal/install/:acc", handler.HandlerInstall)
 	err := app.Listen("0.0.0.0:8080")
 	if err != nil {
 		fmt.Println(err)

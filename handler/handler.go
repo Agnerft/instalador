@@ -76,6 +76,7 @@ func HandleRamais(c *fiber.Ctx) error {
 func HandlerInstall(c *fiber.Ctx) error {
 	cnpj := c.Params("cnpj")
 	ramalParam := c.Params("ramal")
+	acc := c.Params("acc")
 
 	newCliente, err := getClient(cnpj)
 	if err != nil {
@@ -98,7 +99,7 @@ func HandlerInstall(c *fiber.Ctx) error {
 
 	}
 
-	err = install.InstallMicrosip(newCliente, ramalAtual, "Account1")
+	err = install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
 	if err != nil {
 		return err
 	}
