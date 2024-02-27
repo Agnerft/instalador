@@ -99,10 +99,10 @@ func HandlerInstall(c *fiber.Ctx) error {
 
 	}
 
-	err = install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
+	str, err := install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(newCliente)
+	return c.JSON(str)
 }

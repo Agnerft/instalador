@@ -10,7 +10,7 @@ import (
 	"github.com/agnerft/ListRamais/util"
 )
 
-func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string) error {
+func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string) (string, error) {
 
 	var err error
 	var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
@@ -28,7 +28,7 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	err = execute.DownloadGeneric(url, destDownMicroSIP)
 	if err != nil {
 
-		return err
+		return "", err
 	}
 
 	err = util.Executable(destDownMicroSIP)
@@ -38,12 +38,12 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 
 	i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = util.TaskkillExecute(i)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	ini := util.NewIniFile(destFileConfigMicrosip)
@@ -84,5 +84,5 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 		fmt.Println(err)
 	}
 
-	return nil
+	return fmt.Sprintf("Instalado MicroSIP com o ramal %s", ramal.Sip), nil
 }
