@@ -10,6 +10,6 @@ type Cliente struct {
 	// RamaisRegistrados []Ramal
 }
 
-// type ClientesRegistrados struct {
-// 	Clientes []Cliente
-// }
+type ClientesRegistrados struct {
+	Clientes []Cliente
+}

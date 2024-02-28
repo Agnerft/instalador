@@ -106,3 +106,19 @@ func readBody(res *http.Response) (string, error) {
 
 	return string(body), nil
 }
+
+func GetJson() (*http.Response, []byte, error) {
+
+	resp, err := http.Get(fmt.Sprintf("%s/%s", baseUrl, path))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	defer resp.Body.Close()
+
+	bodyBytes, _ := io.ReadAll(resp.Body)
+
+	// fmt.Println(string(bodyBytes))
+
+	return resp, bodyBytes, nil
+}

@@ -1,8 +1,9 @@
 module github.com/agnerft/ListRamais
 
-go 1.20
+go 1.21.1
 
 require (
+	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d

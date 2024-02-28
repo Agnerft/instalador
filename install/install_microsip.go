@@ -20,30 +20,36 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	var url = "https://www.microsip.org/download/MicroSIP-3.21.3.exe"
 
 	fmt.Println(account)
-	err = util.Executable(destDeleleteMicroSIP)
-	if err != nil {
-		fmt.Printf("Erro ou executar o Desinstalador no caminho: %s. \n", destDeleleteMicroSIP)
+
+	if !util.FileIsExist(destDeleleteMicroSIP) {
+		err = util.Executable(destDeleleteMicroSIP)
+		if err != nil {
+			fmt.Printf("Erro ou executar o Desinstalador no caminho: %s. \n", destDeleleteMicroSIP)
+		}
+
 	}
 
-	err = execute.DownloadGeneric(url, destDownMicroSIP)
-	if err != nil {
+	if util.FileIsExist(destDownMicroSIP) {
+		err = execute.DownloadGeneric(url, destDownMicroSIP)
+		if err != nil {
 
-		return "", err
-	}
+			return "", err
+		}
 
-	err = util.Executable(destDownMicroSIP)
-	if err != nil {
-		log.Printf("Erro ao executar o instalador no caminho: %s. \n", destDownMicroSIP)
-	}
+		err = util.Executable(destDownMicroSIP)
+		if err != nil {
+			log.Printf("Erro ao executar o instalador no caminho: %s. \n", destDownMicroSIP)
+		}
 
-	i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
-	if err != nil {
-		return "", err
-	}
+		i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
+		if err != nil {
+			return "", err
+		}
 
-	err = util.TaskkillExecute(i)
-	if err != nil {
-		return "", err
+		err = util.TaskkillExecute(i)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	ini := util.NewIniFile(destFileConfigMicrosip)
