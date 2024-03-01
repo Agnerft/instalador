@@ -33,8 +33,39 @@ func HandleClient(c *fiber.Ctx) error {
 
 	}
 
-	return c.JSON(newCliente)
+	newRamais, err := getRamais(cnpj)
+	if err != nil {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
 
+	response := map[string]interface{}{
+		"json1": newCliente,
+		"json2": newRamais,
+	}
+
+	fmt.Println(response)
+
+	return c.JSON(response)
+
+}
+
+func getRamais(cnpj string) (domain.RamaisRegistrados, error) {
+
+	newClient, err := getClient(cnpj)
+	if err != nil {
+		return domain.RamaisRegistrados{}, err
+	}
+
+	if cliente == nil {
+		newRamais, err := svc.RequestJsonRamal(newClient.Link)
+		if err != nil {
+			return domain.RamaisRegistrados{}, err
+		}
+
+		return newRamais, nil
+	}
+
+	return domain.RamaisRegistrados{}, nil
 }
 
 func getClient(cnpj string) (*domain.Cliente, error) {
