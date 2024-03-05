@@ -13,7 +13,7 @@ import (
 func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string) (string, error) {
 
 	var err error
-	var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
+	// var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
 	var pathMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "microsip.exe")
 	var destDownMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "MicroSIP-3.21.3.exe")
 	var destFileConfigMicrosip = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Roaming", "MicroSIP", "MicroSIP.ini")
@@ -21,15 +21,15 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 
 	fmt.Println(account)
 
-	if !util.FileIsExist(destDeleleteMicroSIP) {
-		err = util.Executable(destDeleleteMicroSIP)
-		if err != nil {
-			fmt.Printf("Erro ou executar o Desinstalador no caminho: %s. \n", destDeleleteMicroSIP)
-		}
+	// if !util.FileIsExist(destDeleleteMicroSIP) {
+	// 	err = util.Executable(destDeleleteMicroSIP)
+	// 	if err != nil {
+	// 		fmt.Printf("Erro ou executar o Desinstalador no caminho: %s. \n", destDeleleteMicroSIP)
+	// 	}
 
-	}
+	// }
 
-	if util.FileIsExist(destDownMicroSIP) {
+	if !util.FileIsExist(destDownMicroSIP) {
 		err = execute.DownloadGeneric(url, destDownMicroSIP)
 		if err != nil {
 
@@ -41,15 +41,6 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 			log.Printf("Erro ao executar o instalador no caminho: %s. \n", destDownMicroSIP)
 		}
 
-		i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
-		if err != nil {
-			return "", err
-		}
-
-		err = util.TaskkillExecute(i)
-		if err != nil {
-			return "", err
-		}
 	}
 
 	ini := util.NewIniFile(destFileConfigMicrosip)
@@ -88,6 +79,21 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	err = ini.WriteIni()
 	if err != nil {
 		fmt.Println(err)
+	}
+
+	i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
+	if err != nil {
+		return "", err
+	}
+
+	err = util.TaskkillExecute(i)
+	if err != nil {
+		return "", err
+	}
+
+	err = util.OpenMicroSIP(pathMicroSIP)
+	if err != nil {
+		return "", err
 	}
 
 	return fmt.Sprintf("Instalado MicroSIP com o ramal %s", ramal.Sip), nil
