@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"os/user"
 	"runtime"
@@ -15,9 +16,13 @@ import (
 func Executable(filePath string) error {
 
 	cmd := exec.Command(filePath, "/S")
-	if err := cmd.Run(); err != nil {
-		return err
 
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Start()
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -9,19 +9,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var (
-	cliente *domain.Cliente
-
-	// url                  = "https://www.microsip.org/download/MicroSIP-3.21.3.exe"
-	// destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
-	// destRunningMicroSIP    = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "microsip.exe")
-	// destDownMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "MicroSIP-3.21.3.exe")
-	// destFileConfigMicrosip = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Roaming", "MicroSIP", "microsip.ini")
-	// ramalAtual             string
-	// processName     = "microsip.exe"
-	svc             = services.NewServiceCliente()
-	ramaisDoCliente []string
-)
+func HandlePingPong(c *fiber.Ctx) error {
+	resp := map[string]string{
+		"resp": "pong",
+	}
+	return c.JSON(resp)
+}
 
 func HandleClient(c *fiber.Ctx) error {
 
@@ -51,6 +44,9 @@ func HandleClient(c *fiber.Ctx) error {
 
 func getRamais(cnpj string) (domain.RamaisRegistrados, error) {
 
+	svc := services.NewServiceCliente()
+	var cliente *domain.Cliente
+
 	newClient, err := getClient(cnpj)
 	if err != nil {
 		return domain.RamaisRegistrados{}, err
@@ -70,6 +66,9 @@ func getRamais(cnpj string) (domain.RamaisRegistrados, error) {
 
 func getClient(cnpj string) (*domain.Cliente, error) {
 
+	svc := services.NewServiceCliente()
+	var cliente *domain.Cliente
+
 	if cliente == nil || cliente.Documento != cnpj {
 
 		cliente, err := svc.RequestJsonCliente(cnpj)
@@ -86,7 +85,7 @@ func getClient(cnpj string) (*domain.Cliente, error) {
 }
 
 func HandleRamais(c *fiber.Ctx) error {
-
+	svc := services.NewServiceCliente()
 	cnpj := c.Params("cnpj")
 
 	newCliente, err := getClient(cnpj)
@@ -105,6 +104,7 @@ func HandleRamais(c *fiber.Ctx) error {
 }
 
 func HandlerInstall(c *fiber.Ctx) error {
+	svc := services.NewServiceCliente()
 	cnpj := c.Params("cnpj")
 	ramalParam := c.Params("ramal")
 	acc := c.Params("acc")
