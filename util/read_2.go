@@ -135,6 +135,7 @@ func (ini *IniFile) WriteIni() error {
 			file.WriteString(fmt.Sprintf("%s=%s\n", section, value))
 		}
 	}
+	defer file.Close()
 	return nil
 }
 

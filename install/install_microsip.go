@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"time"
 
 	"github.com/agnerft/ListRamais/domain"
 	"github.com/agnerft/ListRamais/execute"
@@ -11,7 +12,7 @@ import (
 )
 
 func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string) (string, error) {
-
+	duration := 5 * time.Second
 	var err error
 	// var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
 	var pathMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "microsip.exe")
@@ -21,24 +22,46 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 
 	fmt.Println(account)
 
-	// if !util.FileIsExist(destDeleleteMicroSIP) {
-	// 	err = util.Executable(destDeleleteMicroSIP)
-	// 	if err != nil {
-	// 		fmt.Printf("Erro ou executar o Desinstalador no caminho: %s. \n", destDeleleteMicroSIP)
-	// 	}
+	err = execute.DownloadGeneric(url, destDownMicroSIP)
+	if err != nil {
+		return "", err
+	}
 
+	err = util.Executable(destDownMicroSIP)
+	if err != nil {
+		log.Printf("Erro ao executar o instalador no caminho: %s. \n", destDownMicroSIP)
+	}
+
+	time.Sleep(duration)
+
+	i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(i)
+	// err = util.OpenMicroSIP(pathMicroSIP)
+	// if err != nil {
+	// 	return "", err
 	// }
 
-	if !util.FileIsExist(destDownMicroSIP) {
-		err = execute.DownloadGeneric(url, destDownMicroSIP)
-		if err != nil {
+	err = util.TaskkillExecute(i)
+	if err != nil {
+		return "", err
+	}
 
+	if !util.FileIsExist(destFileConfigMicrosip) {
+
+		err = util.OpenMicroSIP(pathMicroSIP)
+		if err != nil {
 			return "", err
 		}
 
-		err = util.Executable(destDownMicroSIP)
+		time.Sleep(duration)
+
+		err = util.TaskkillExecute(i)
 		if err != nil {
-			log.Printf("Erro ao executar o instalador no caminho: %s. \n", destDownMicroSIP)
+			return "", err
 		}
 
 	}
@@ -49,20 +72,15 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	cfg := domain.NewConfig()
 
-	if !ini.ExistsVauleFromSectionAndKey("Settings", "videoBitrate", "256") {
-
-		mpConfigSettings := make(map[string]string, 0)
-		mpConfigSettings["videoBitrate"] = "256"
-		mpConfigSettings["recordingPath"] = filepath.Join(util.UserCurrent().HomeDir, "Desktop")
-		mpConfigSettings["recordingFormat"] = "mp3"
-		mpConfigSettings["autoAnswer"] = "all"
-		mpConfigSettings["denyIncoming"] = ""
-		ini.UpdateBatchSection("Settings", mpConfigSettings)
-
-	}
+	mpConfigSettings := make(map[string]string, 0)
+	mpConfigSettings["videoBitrate"] = "256"
+	mpConfigSettings["recordingPath"] = filepath.Join(util.UserCurrent().HomeDir, "Desktop")
+	mpConfigSettings["recordingFormat"] = "mp3"
+	mpConfigSettings["autoAnswer"] = "all"
+	mpConfigSettings["denyIncoming"] = ""
+	ini.UpdateBatchSection("Settings", mpConfigSettings)
 
 	cfg.Label = ramal.Sip
 	cfg.Server = cliente.Link_sip
@@ -79,16 +97,6 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	err = ini.WriteIni()
 	if err != nil {
 		fmt.Println(err)
-	}
-
-	i, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
-	if err != nil {
-		return "", err
-	}
-
-	err = util.TaskkillExecute(i)
-	if err != nil {
-		return "", err
 	}
 
 	err = util.OpenMicroSIP(pathMicroSIP)

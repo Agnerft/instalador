@@ -28,8 +28,7 @@ func NewServiceCliente() *ServiceRequest {
 }
 
 func (s *ServiceRequest) RequestJsonCliente(cnpj string) (domain.Cliente, error) {
-	// Fazer uma requisição HTTP para obter os dados JSON
-	// var clientes []Cliente
+
 	response, err := s.httpClient.Get(fmt.Sprintf("%s/%s?%s=%s", baseUrl, path, query, cnpj))
 
 	if err != nil {
@@ -52,10 +51,6 @@ func (s *ServiceRequest) RequestJsonCliente(cnpj string) (domain.Cliente, error)
 		log.Fatal("Erro ao decodificar o JSON:", err)
 		return domain.Cliente{}, err
 	}
-
-	// if len(cli.Clientes) > 0 {
-	// 	return domain.Cliente{}, nil
-	// }
 
 	return cli[0], nil
 }
@@ -84,16 +79,16 @@ func (s *ServiceRequest) RequestJsonRamal(url string) (domain.RamaisRegistrados,
 		return domain.RamaisRegistrados{}, err
 	}
 	count := 0
-	// Imprimir os dados dos ramais registrados
+
 	for _, ramal := range ramais.RamaisRegistrados {
+
 		// fmt.Printf("SIP: %s, IP: %s\n", ramal.Sip, ramal.Ip)
+
 		if ramal.Sip != "" {
 			count++
 		}
 
 	}
-
-	fmt.Println(count)
 
 	return ramais, nil
 }

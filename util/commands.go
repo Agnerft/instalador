@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -105,4 +106,30 @@ func GetPIDbyName(processName string) (int, error) {
 	}
 
 	return 0, err
+}
+
+func RemovePath(file string) error {
+
+	err := filepath.Walk(file, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// Verificar se é um arquivo (não um diretório)
+		if !info.IsDir() {
+			// Excluir o arquivo
+			err := os.Remove(path)
+			if err != nil {
+				fmt.Printf("Erro ao excluir o arquivo %s: %s\n", path, err)
+				return err
+			}
+			fmt.Printf("Arquivo %s excluído com sucesso.\n", path)
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Println("Erro ao listar arquivos na pasta:", err)
+		return err
+	}
+
+	return nil
 }

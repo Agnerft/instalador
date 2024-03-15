@@ -5,4 +5,4 @@
 /_testdata/tmp
 /main/*.exe
 /main/*.syso
-win-unpacked/
+# win-unpacked/
