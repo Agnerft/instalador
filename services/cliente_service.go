@@ -121,7 +121,7 @@ func GetJson() (*http.Response, []byte, error) {
 	return resp, bodyBytes, nil
 }
 
-func (s *ServiceRequest) PostRamais(url string) ([]int, error) {
+func (s *ServiceRequest) PostRamais(url string) ([]byte, error) {
 	ramalGVC := 7849
 	resquestBody := []byte(`{ "cmd" : "sip show peers" }`)
 
@@ -164,5 +164,15 @@ func (s *ServiceRequest) PostRamais(url string) ([]int, error) {
 
 	}
 
-	return ramais, nil
+	ramal := domain.RamalSolo{
+		Ramais: ramais,
+	}
+
+	jsonData, err := json.Marshal(ramal)
+	if err != nil {
+		fmt.Println("Erro ao converter para JSON:", err)
+
+	}
+
+	return jsonData, nil
 }

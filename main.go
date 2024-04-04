@@ -46,27 +46,6 @@ func main() {
 		fmt.Println("Deu ruim")
 	}
 
-	// partes := strings.Split(res[0], ",")
-
-	// ramais := make([]string, 0)
-
-	// for _, str := range partes {
-	// 	parts := strings.Fields(str)
-
-	// 	// Selecionar apenas o primeiro elemento
-	// 	if len(parts) > 0 {
-	// 		primeiraInformacao := parts[0]
-	// 		ramais = append(ramais, primeiraInformacao)
-	// 	}
-
-	// }
-
-	// fmt.Println(partes[1])
-
-	// for i, s := range res {
-	// 	res[i] = strings.ReplaceAll(s, `"`, ";")
-	// }
-
-	fmt.Println(res)
+	fmt.Println(string(res))
 
 }

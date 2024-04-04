@@ -10,3 +10,7 @@ type Ramal struct {
 type RamaisRegistrados struct {
 	RamaisRegistrados []Ramal `json:"ramais_registrados"`
 }
+
+type RamalSolo struct {
+	Ramais []int `json:"ramais"`
+}
