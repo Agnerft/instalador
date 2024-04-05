@@ -164,8 +164,10 @@ func (s *ServiceRequest) PostRamais(url string) (domain.RamalSolo, error) {
 
 	}
 
+	sliceRamais := intsToRamal(ramais)
+
 	ramal := domain.RamalSolo{
-		Ramais: ramais,
+		Ramais: sliceRamais,
 	}
 
 	// jsonData, err := json.Marshal(ramal)
@@ -175,4 +177,14 @@ func (s *ServiceRequest) PostRamais(url string) (domain.RamalSolo, error) {
 	// }
 
 	return ramal, nil
+}
+
+func intsToRamal(intSlice []int) []domain.Ramal {
+	ramalSlice := make([]domain.Ramal, len(intSlice))
+
+	for i, val := range intSlice {
+		ramalSlice[i] = domain.Ramal{Sip: val}
+	}
+
+	return ramalSlice
 }

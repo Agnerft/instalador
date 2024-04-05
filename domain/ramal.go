@@ -1,9 +1,9 @@
 package domain
 
 type Ramal struct {
-	Sip   string `json:"sip"`
-	Ip    string `json:"ip"`
-	InUse bool   `json:"inuse"`
+	Sip int `json:"sip"`
+	// Ip    string `json:"ip"`
+	// InUse bool   `json:"inuse"`
 	// Empresa string `json:"empresa"`
 }
 
@@ -12,5 +12,5 @@ type RamaisRegistrados struct {
 }
 
 type RamalSolo struct {
-	Ramais []int `json:"ramais"`
+	Ramais []Ramal `json:"ramais"`
 }

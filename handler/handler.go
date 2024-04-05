@@ -56,23 +56,23 @@ func HandleClient(c *fiber.Ctx) error {
 
 }
 
-func getRamais(cnpj string) (domain.RamalSolo, error) {
+func getRamais(cnpj string) (domain.RamaisRegistrados, error) {
 
 	newClient, err := getClient(cnpj)
 	if err != nil {
-		return domain.RamalSolo{}, err
+		return domain.RamaisRegistrados{}, err
 	}
 
 	if &cliente != nil {
-		newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newClient.Link, "asterisk_exec"))
+		newRamais, err := svc.RequestJsonRamal(newClient.Link)
 		if err != nil {
-			return domain.RamalSolo{}, err
+			return domain.RamaisRegistrados{}, err
 		}
 
 		return newRamais, nil
 	}
 
-	return domain.RamalSolo{}, nil
+	return domain.RamaisRegistrados{}, nil
 }
 
 func getClient(cnpj string) (*domain.Cliente, error) {
@@ -104,7 +104,7 @@ func HandleRamais(c *fiber.Ctx) error {
 
 	}
 
-	newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newCliente.Link, "asterisk_exec"))
+	newRamais, err := svc.RequestJsonRamal(newCliente.Link)
 	if err != nil {
 		return err
 	}
@@ -126,6 +126,7 @@ func HandlerInstall(c *fiber.Ctx) error {
 	svc := services.NewServiceCliente()
 	cnpj := c.Params("cnpj")
 	ramalParam := c.Params("ramal")
+	ramalParamInt, _ := strconv.Atoi(ramalParam)
 	acc := c.Params("acc")
 
 	newCliente, err := getClient(cnpj)
@@ -133,24 +134,28 @@ func HandlerInstall(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newCliente.Link, "asterisk_exec"))
+	newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newCliente.Link, ""))
 	if err != nil {
 		return err
 	}
 
-	var ramalAtual domain.RamalSolo
+	var ramalAtual domain.Ramal
 
-	for i, ramal := range newRamais.Ramais {
-		ramall, _ := strconv.Atoi(ramalParam)
-		if ramal == ramall {
+	for _, ramal := range newRamais.Ramais {
+
+		if ramal.Sip == ramalParamInt {
 			fmt.Println(ramal)
-			ramalAtual.Ramais[i] = ramal
+			// fmt.Println(ramalAtual.Ramais)
+			// ramalAtual.Ramais = append(ramalAtual.Ramais, ramal)
+
+			ramalAtual = ramal
+
 			break
 		}
 
 	}
 
-	_, err = install.InstallMicrosip(newCliente, ramalAtual.Ramais[], fmt.Sprintf("%s%s", "Account", acc))
+	_, err = install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
 	if err != nil {
 		return err
 	}
@@ -160,7 +165,7 @@ func HandlerInstall(c *fiber.Ctx) error {
 	response = map[string]interface{}{
 		"cliente": newCliente.Cliente,
 		"doc":     newCliente.Documento,
-		"ramal":   ramalAtual.Sip,
+		"ramal":   ramalAtual,
 		"status":  exist,
 	}
 
