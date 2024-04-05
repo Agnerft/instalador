@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"strconv"
 
 	"github.com/agnerft/ListRamais/domain"
 	"github.com/agnerft/ListRamais/install"
@@ -55,23 +56,23 @@ func HandleClient(c *fiber.Ctx) error {
 
 }
 
-func getRamais(cnpj string) (domain.RamaisRegistrados, error) {
+func getRamais(cnpj string) (domain.RamalSolo, error) {
 
 	newClient, err := getClient(cnpj)
 	if err != nil {
-		return domain.RamaisRegistrados{}, err
+		return domain.RamalSolo{}, err
 	}
 
 	if &cliente != nil {
-		newRamais, err := svc.RequestJsonRamal(newClient.Link)
+		newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newClient.Link, "asterisk_exec"))
 		if err != nil {
-			return domain.RamaisRegistrados{}, err
+			return domain.RamalSolo{}, err
 		}
 
 		return newRamais, nil
 	}
 
-	return domain.RamaisRegistrados{}, nil
+	return domain.RamalSolo{}, nil
 }
 
 func getClient(cnpj string) (*domain.Cliente, error) {
@@ -103,7 +104,7 @@ func HandleRamais(c *fiber.Ctx) error {
 
 	}
 
-	newRamais, err := svc.RequestJsonRamal(newCliente.Link)
+	newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newCliente.Link, "asterisk_exec"))
 	if err != nil {
 		return err
 	}
@@ -132,23 +133,24 @@ func HandlerInstall(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	newRamais, err := svc.RequestJsonRamal(newCliente.Link)
+	newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newCliente.Link, "asterisk_exec"))
 	if err != nil {
 		return err
 	}
 
-	var ramalAtual domain.Ramal
+	var ramalAtual domain.RamalSolo
 
-	for _, ramal := range newRamais.RamaisRegistrados {
-		if ramal.Sip == ramalParam {
-			fmt.Println(ramal.Sip)
-			ramalAtual = ramal
+	for i, ramal := range newRamais.Ramais {
+		ramall, _ := strconv.Atoi(ramalParam)
+		if ramal == ramall {
+			fmt.Println(ramal)
+			ramalAtual.Ramais[i] = ramal
 			break
 		}
 
 	}
 
-	_, err = install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
+	_, err = install.InstallMicrosip(newCliente, ramalAtual.Ramais[], fmt.Sprintf("%s%s", "Account", acc))
 	if err != nil {
 		return err
 	}

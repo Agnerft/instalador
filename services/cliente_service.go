@@ -121,13 +121,13 @@ func GetJson() (*http.Response, []byte, error) {
 	return resp, bodyBytes, nil
 }
 
-func (s *ServiceRequest) PostRamais(url string) ([]byte, error) {
+func (s *ServiceRequest) PostRamais(url string) (domain.RamalSolo, error) {
 	ramalGVC := 7849
 	resquestBody := []byte(`{ "cmd" : "sip show peers" }`)
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(resquestBody))
 	if err != nil {
-		return nil, err
+		return domain.RamalSolo{}, err
 	}
 
 	defer resp.Body.Close()
@@ -136,7 +136,7 @@ func (s *ServiceRequest) PostRamais(url string) ([]byte, error) {
 
 	_, err = body.ReadFrom(resp.Body)
 	if err != nil {
-		return nil, err
+		return domain.RamalSolo{}, err
 	}
 
 	lines := strings.Split(strings.TrimSuffix(body.String(), "\n"), "\n")
@@ -168,11 +168,11 @@ func (s *ServiceRequest) PostRamais(url string) ([]byte, error) {
 		Ramais: ramais,
 	}
 
-	jsonData, err := json.Marshal(ramal)
-	if err != nil {
-		fmt.Println("Erro ao converter para JSON:", err)
+	// jsonData, err := json.Marshal(ramal)
+	// if err != nil {
+	// 	fmt.Println("Erro ao converter para JSON:", err)
 
-	}
+	// }
 
-	return jsonData, nil
+	return ramal, nil
 }

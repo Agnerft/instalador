@@ -11,7 +11,7 @@ import (
 	"github.com/agnerft/ListRamais/util"
 )
 
-func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string) (string, error) {
+func InstallMicrosip(cliente *domain.Cliente, ramal domain.RamalSolo, account string) (string, error) {
 	duration := 5 * time.Second
 	var err error
 	// var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
@@ -82,7 +82,7 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	mpConfigSettings["denyIncoming"] = ""
 	ini.UpdateBatchSection("Settings", mpConfigSettings)
 
-	cfg.Label = ramal.Sip
+	cfg.Label = ramal.Ramais
 	cfg.Server = cliente.Link_sip
 	cfg.Proxy = cliente.Link_sip
 	cfg.Domain = cliente.Link_sip

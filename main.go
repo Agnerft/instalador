@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/agnerft/ListRamais/services"
-)
+import "github.com/agnerft/ListRamais/router"
 
 func main() {
 	var err error
@@ -34,18 +30,18 @@ func main() {
 	// 	fmt.Println("Deu erro")
 	// }
 
-	// err = router.InitRouter()
-	// if err != nil {
-	// 	return
-	// }
-	// var extract = map[string]string{}
-	url := "http://mscelular.gvctelecom.com.br:1133/asterisk_exec"
-
-	res, err := services.NewServiceCliente().PostRamais(url)
+	err = router.InitRouter()
 	if err != nil {
-		fmt.Println("Deu ruim")
+		return
 	}
+	// var extract = map[string]string{}
+	// url := "http://mscelular.gvctelecom.com.br:1133/asterisk_exec"
 
-	fmt.Println(string(res))
+	// res, err := services.NewServiceCliente().PostRamais(url)
+	// if err != nil {
+	// 	fmt.Println("Deu ruim")
+	// }
+
+	// fmt.Println(res)
 
 }
