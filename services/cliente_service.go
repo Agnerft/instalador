@@ -58,44 +58,6 @@ func (s *ServiceRequest) RequestJsonCliente(cnpj string) (domain.Cliente, error)
 	return cli[0], nil
 }
 
-func (s *ServiceRequest) RequestJsonRamal(url string) (domain.RamaisRegistrados, error) {
-	// Fazer uma requisição HTTP para obter os dados JSON
-
-	response, err := s.httpClient.Get(fmt.Sprintf("%s/%s", url, "status_central"))
-	if err != nil {
-		log.Fatal("Erro ao fazer a requisição HTTP:", err)
-		return domain.RamaisRegistrados{}, err
-	}
-
-	defer response.Body.Close()
-
-	var ramais domain.RamaisRegistrados
-
-	body, err := readBody(response)
-	if err != nil {
-		return domain.RamaisRegistrados{}, err
-	}
-
-	err = json.Unmarshal([]byte(body), &ramais)
-	if err != nil {
-		log.Fatal("Erro ao decodificar o JSON:", err)
-		return domain.RamaisRegistrados{}, err
-	}
-	count := 0
-
-	for _, ramal := range ramais.RamaisRegistrados {
-
-		// fmt.Printf("SIP: %s, IP: %s\n", ramal.Sip, ramal.Ip)
-
-		if ramal.Sip != "" {
-			count++
-		}
-
-	}
-
-	return ramais, nil
-}
-
 func readBody(res *http.Response) (string, error) {
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -169,12 +131,6 @@ func (s *ServiceRequest) PostRamais(url string) (domain.RamalSolo, error) {
 	ramal := domain.RamalSolo{
 		Ramais: sliceRamais,
 	}
-
-	// jsonData, err := json.Marshal(ramal)
-	// if err != nil {
-	// 	fmt.Println("Erro ao converter para JSON:", err)
-
-	// }
 
 	return ramal, nil
 }

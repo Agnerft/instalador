@@ -89,14 +89,22 @@ func (ini *IniFile) Readini() error {
 	return nil
 }
 
-func (ini *IniFile) UpdateSection(section string, key string, value string) {
+func (ini *IniFile) UpdateSection(section string, key string, value string) bool {
 	ini.Sections[section][key] = value
+
+	if ini.ExistsKey(section, key) {
+		return true
+	}
+	return false
 }
 
-func (ini *IniFile) UpdateBatchSection(section string, values map[string]string) {
+func (ini *IniFile) UpdateBatchSection(section string, values map[string]string) bool {
 	for key, value := range values {
 		ini.Sections[section][key] = value
 	}
+
+	return ini.ExistsSection(section)
+
 }
 
 func (ini *IniFile) AddSection(section string) {

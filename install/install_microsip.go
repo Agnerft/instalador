@@ -73,16 +73,21 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	if err != nil {
 		fmt.Println(err)
 	}
-	cfg := domain.NewConfig()
+
+	time.Sleep(duration)
 
 	mpConfigSettings := make(map[string]string, 0)
-	mpConfigSettings["videoBitrate"] = "256"
+	set := "Settings"
+
+	// fmt.Println(ini.ExistsKey(set, rec))
+
 	mpConfigSettings["recordingPath"] = filepath.Join(util.UserCurrent().HomeDir, "Desktop")
 	mpConfigSettings["recordingFormat"] = "mp3"
 	mpConfigSettings["autoAnswer"] = "all"
 	mpConfigSettings["denyIncoming"] = ""
-	ini.UpdateBatchSection("Settings", mpConfigSettings)
+	fmt.Println(ini.UpdateBatchSection(set, mpConfigSettings))
 
+	cfg := domain.NewConfig()
 	ramalString := strconv.Itoa(ramal.Sip)
 
 	cfg.Label = ramalString
@@ -103,6 +108,22 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	}
 
 	err = util.OpenMicroSIP(pathMicroSIP)
+	if err != nil {
+		return "", err
+	}
+
+	i2, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(i2)
+	// err = util.OpenMicroSIP(pathMicroSIP)
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	err = util.TaskkillExecute(i2)
 	if err != nil {
 		return "", err
 	}
