@@ -133,3 +133,34 @@ func RemovePath(file string) error {
 
 	return nil
 }
+
+func CleanFiles(file string) error {
+	dir, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+
+	defer dir.Close()
+
+	files, err := dir.Readdirnames(-1)
+	if err != nil {
+
+		return err
+	}
+
+	if len(files) == 0 {
+		fmt.Println("Pasta vazia")
+	} else {
+
+		for _, nameFile := range files {
+			err := os.Remove(fmt.Sprintf("%s/%s", file, nameFile))
+			if err != nil {
+				return err
+
+			}
+			fmt.Printf("Removido o arquivo: %s", nameFile)
+		}
+	}
+
+	return nil
+}

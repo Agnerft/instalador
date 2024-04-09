@@ -16,12 +16,34 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	duration := 5 * time.Second
 	var err error
 	// var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
-	var pathMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "microsip.exe")
-	var destDownMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "MicroSIP-3.21.3.exe")
-	var destFileConfigMicrosip = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Roaming", "MicroSIP", "MicroSIP.ini")
+	var pathMicroSIP = filepath.Join(util.UserCurrent().HomeDir,
+		"AppData",
+		"Local",
+		"MicroSIP",
+		"microsip.exe")
+	var destDownMicroSIP = filepath.Join(util.UserCurrent().HomeDir,
+		"AppData",
+		"Local",
+		"MicroSIP",
+		"MicroSIP-3.21.3.exe")
+	var destFileConfigMicrosip = filepath.Join(util.UserCurrent().HomeDir,
+		"AppData",
+		"Roaming",
+		"MicroSIP",
+		"MicroSIP.ini")
 	var url = "https://www.microsip.org/download/MicroSIP-3.21.3.exe"
 
 	fmt.Println(account)
+
+	confiMicroSIP := filepath.Join(util.UserCurrent().HomeDir,
+		"AppData",
+		"Roaming",
+		"MicroSIP")
+
+	err = util.CleanFiles(confiMicroSIP)
+	if err != nil {
+		return "", err
+	}
 
 	err = execute.DownloadGeneric(url, destDownMicroSIP)
 	if err != nil {
@@ -107,26 +129,26 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 		fmt.Println(err)
 	}
 
-	err = util.OpenMicroSIP(pathMicroSIP)
-	if err != nil {
-		return "", err
-	}
-
-	i2, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
-	if err != nil {
-		return "", err
-	}
-
-	fmt.Println(i2)
 	// err = util.OpenMicroSIP(pathMicroSIP)
 	// if err != nil {
 	// 	return "", err
 	// }
 
-	err = util.TaskkillExecute(i2)
-	if err != nil {
-		return "", err
-	}
+	// i2, err := util.GetPIDbyName(filepath.Base(pathMicroSIP))
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	// fmt.Println(i2)
+	// // err = util.OpenMicroSIP(pathMicroSIP)
+	// // if err != nil {
+	// // 	return "", err
+	// // }
+
+	// err = util.TaskkillExecute(i2)
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	return fmt.Sprintf("Instalado MicroSIP com o ramal %s", ramalString), nil
 }

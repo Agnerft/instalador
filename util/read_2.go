@@ -92,10 +92,7 @@ func (ini *IniFile) Readini() error {
 func (ini *IniFile) UpdateSection(section string, key string, value string) bool {
 	ini.Sections[section][key] = value
 
-	if ini.ExistsKey(section, key) {
-		return true
-	}
-	return false
+	return ini.ExistsKey(section, key)
 }
 
 func (ini *IniFile) UpdateBatchSection(section string, values map[string]string) bool {

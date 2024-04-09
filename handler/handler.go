@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -229,7 +230,31 @@ func HandlerUninstall(c *fiber.Ctx) error {
 		"removido": exist,
 	}
 
-	fmt.Println(response)
+	dir, err := os.Open(confiMicroSIP)
+	if err != nil {
+		fmt.Println("Deu erro para ler")
+	}
+
+	defer dir.Close()
+
+	files, err := dir.Readdirnames(-1)
+	if err != nil {
+
+		fmt.Println("Erro ao ler os nomes dos arquivos.")
+	}
+
+	if len(files) == 0 {
+		fmt.Println("Pasta vazia")
+	} else {
+		// fmt.Println("Arquivos:")
+		for _, nameFile := range files {
+			err := os.Remove(fmt.Sprintf("%s/%s", confiMicroSIP, nameFile))
+			if err != nil {
+				fmt.Println("Deu erro pra excluir")
+			}
+			fmt.Printf("Removido o arquivo: %s", nameFile)
+		}
+	}
 
 	return c.JSON(response)
 
