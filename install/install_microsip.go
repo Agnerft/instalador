@@ -120,7 +120,7 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	cfg.Password = fmt.Sprintf("%s%s", ramalString, "@abc")
 	cfg.AuthID = ramalString
 
-	fmt.Println(*cfg)
+	// fmt.Println(*cfg)
 
 	ini.AddSectionAccount(account, *cfg)
 

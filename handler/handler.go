@@ -23,11 +23,17 @@ func init() {
 	svc = *services.NewServiceCliente()
 }
 
-func HandlePingPong(c *fiber.Ctx) error {
-	resp := map[string]string{
-		"resp": "pong",
+func HandleCallWhatsApp(c *fiber.Ctx) error {
+	cnpj := c.Params("cnpj")
+	ramal := c.Params("ramal")
+	urlWhatsapp := fmt.Sprintf("%s%s%s%s%s", `https://api.whatsapp.com/send/?phone=555130655144&text=cnpj%3D`, cnpj, `%3Bramal%3D`, ramal, `&type=phone_number&app_absent=0`)
+	// `https://api.whatsapp.com/send/?phone=555130655144&text=cnpj%3D20905507000100%3Bramal%3D7801&type=phone_number&app_absent=0`
+	err := util.OpenBrowser(urlWhatsapp)
+	if err != nil {
+		return err
 	}
-	return c.JSON(resp)
+
+	return c.JSON(c.Status(200))
 }
 
 func HandleClient(c *fiber.Ctx) error {
@@ -156,7 +162,7 @@ func HandlerInstall(c *fiber.Ctx) error {
 
 	}
 
-	_, err = install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
+	r, err := install.InstallMicrosip(newCliente, ramalAtual, fmt.Sprintf("%s%s", "Account", acc))
 	if err != nil {
 		return err
 	}
@@ -166,9 +172,11 @@ func HandlerInstall(c *fiber.Ctx) error {
 	response = map[string]interface{}{
 		"cliente": newCliente.Cliente,
 		"doc":     newCliente.Documento,
-		"ramal":   ramalAtual,
+		"ramal":   ramalAtual.Sip,
 		"status":  exist,
 	}
+	fmt.Println(r)
+	fmt.Println(response)
 
 	return c.JSON(response)
 }

@@ -39,7 +39,7 @@ func UserCurrent() user.User {
 	return *usr
 }
 
-func OpenBrowser(url string) {
+func OpenBrowser(url string) error {
 	var err error
 	switch runtime.GOOS {
 	case "linux":
@@ -50,12 +50,14 @@ func OpenBrowser(url string) {
 		err = exec.Command("open", url).Start()
 	default:
 		fmt.Printf("Não foi possível detectar o sistema operacional para abrir o navegador automaticamente.")
-		return
+		return err
 	}
 
 	if err != nil {
 		fmt.Printf("Erro ao abrir o navegador: %v\n", err)
 	}
+
+	return nil
 }
 
 func TaskkillExecute(pid int) error {

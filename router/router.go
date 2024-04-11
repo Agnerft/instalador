@@ -11,7 +11,7 @@ import (
 func InitRouter() error {
 	app := fiber.New(fiber.Config{})
 
-	app.Get("/ping", handler.HandlePingPong)
+	app.Get("/:cnpj/:ramal", handler.HandleCallWhatsApp)
 	app.Get("/:cnpj", handler.HandleClient)
 	app.Get("/:cnpj/ramais", handler.HandleRamais)
 	app.Get("/:cnpj/:ramal/install/:acc", handler.HandlerInstall)
