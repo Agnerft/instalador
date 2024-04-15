@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/agnerft/ListRamais/domain"
 )
 
 // var UsrCurr *user.User
@@ -162,6 +165,25 @@ func CleanFiles(file string) error {
 			}
 			fmt.Printf("Removido o arquivo: %s", nameFile)
 		}
+	}
+
+	return nil
+}
+
+func FileInfos(ramais domain.RamalSolo) error {
+
+	data := map[string]interface{}{
+		"sip": ramais,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile("file.json", jsonData, 0644)
+	if err != nil {
+		return err
 	}
 
 	return nil

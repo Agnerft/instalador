@@ -7,10 +7,10 @@ type Ramal struct {
 	// Empresa string `json:"empresa"`
 }
 
-type RamaisRegistrados struct {
-	RamaisRegistrados []Ramal `json:"ramais_registrados"`
-}
-
 type RamalSolo struct {
 	Ramais []Ramal `json:"ramais"`
+}
+
+type RamaisRegistrados struct {
+	RamaisRegistrados []Ramal `json:"ramais_registrados"`
 }

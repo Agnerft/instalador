@@ -23,6 +23,14 @@ func init() {
 	svc = *services.NewServiceCliente()
 }
 
+var statusMessages = map[int]string{
+	200: "OK",
+	400: "Bad Request",
+	401: "Unauthorized",
+	404: "Not Found",
+	500: "Internal Server Error",
+}
+
 func HandleCallWhatsApp(c *fiber.Ctx) error {
 	cnpj := c.Params("cnpj")
 	ramal := c.Params("ramal")
@@ -82,15 +90,20 @@ func getRamais(cnpj string) (domain.RamalSolo, error) {
 	return domain.RamalSolo{}, nil
 }
 
-func getClient(cnpj string) (*domain.Cliente, error) {
+func getClient(cnpj string) (*domain.Cliente, domain.HTTPError) {
 
 	svc := services.NewServiceCliente()
+	e := domain.HTTPError{}
 
 	if &cliente != nil || cliente.Documento != cnpj {
 
 		cliente, err := svc.RequestJsonCliente(cnpj)
 		if err != nil {
-			return nil, err
+			e = domain.HTTPError{
+				StatusCode: 404,
+				Message:    "Não encontrado",
+			}
+			return nil, e
 
 		} else {
 			return &cliente, nil
@@ -266,4 +279,17 @@ func HandlerUninstall(c *fiber.Ctx) error {
 
 	return c.JSON(response)
 
+}
+
+func HandlerSaveFile(c *fiber.Ctx) error {
+	cnpj := c.Params("cnpj")
+	err := domain.HTTPError{}
+	err = domain.HTTPError{
+		StatusCode: fiber.ErrBadGateway.Code,
+		Message:    "Deu erro para salvar o arquivo",
+	}
+	newClient, err := getClient(cnpj)
+	if err != nil {
+		return c.Status(err.StatusCode).SendString(err.Message)
+	}
 }
