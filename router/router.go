@@ -13,9 +13,10 @@ func InitRouter() error {
 
 	app.Get("/:cnpj", handler.HandleClient)
 	app.Get("/:cnpj/all", handler.HandleRamais)
-	app.Get("/:cnpj/:ramal", handler.HandleCallWhatsApp)
+	// app.Get("/:cnpj/:ramal", handler.HandleCallWhatsApp)
 	app.Get("/:cnpj/:ramal/install/:acc", handler.HandlerInstall)
 	app.Get("/:cnpj/uninstall", handler.HandlerUninstall)
+	app.Get("/:cnpj/file", handler.HandlerSaveFile)
 	err := app.Listen("0.0.0.0:8080")
 	if err != nil {
 		fmt.Println(err)

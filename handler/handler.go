@@ -23,26 +23,18 @@ func init() {
 	svc = *services.NewServiceCliente()
 }
 
-var statusMessages = map[int]string{
-	200: "OK",
-	400: "Bad Request",
-	401: "Unauthorized",
-	404: "Not Found",
-	500: "Internal Server Error",
-}
+// func HandleCallWhatsApp(c *fiber.Ctx) error {
+// 	cnpj := c.Params("cnpj")
+// 	ramal := c.Params("ramal")
+// 	urlWhatsapp := fmt.Sprintf("%s%s%s%s%s", `https://api.whatsapp.com/send/?phone=555130655144&text=cnpj%3D`, cnpj, `%3Bramal%3D`, ramal, `&type=phone_number&app_absent=0`)
+// 	// `https://api.whatsapp.com/send/?phone=555130655144&text=cnpj%3D20905507000100%3Bramal%3D7801&type=phone_number&app_absent=0`
+// 	err := util.OpenBrowser(urlWhatsapp)
+// 	if err != nil {
+// 		return err
+// 	}
 
-func HandleCallWhatsApp(c *fiber.Ctx) error {
-	cnpj := c.Params("cnpj")
-	ramal := c.Params("ramal")
-	urlWhatsapp := fmt.Sprintf("%s%s%s%s%s", `https://api.whatsapp.com/send/?phone=555130655144&text=cnpj%3D`, cnpj, `%3Bramal%3D`, ramal, `&type=phone_number&app_absent=0`)
-	// `https://api.whatsapp.com/send/?phone=555130655144&text=cnpj%3D20905507000100%3Bramal%3D7801&type=phone_number&app_absent=0`
-	err := util.OpenBrowser(urlWhatsapp)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(c.Status(200))
-}
+// 	return c.JSON(c.Status(200))
+// }
 
 func HandleClient(c *fiber.Ctx) error {
 	var response = map[string]interface{}{}
@@ -51,13 +43,13 @@ func HandleClient(c *fiber.Ctx) error {
 	// fmt.Println(response)
 	newCliente, err := getClient(cnpj)
 	if err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
+		return err
 
 	}
 
 	newRamais, err := getRamais(cnpj)
 	if err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
+		return err
 	}
 
 	response = map[string]interface{}{
@@ -90,20 +82,16 @@ func getRamais(cnpj string) (domain.RamalSolo, error) {
 	return domain.RamalSolo{}, nil
 }
 
-func getClient(cnpj string) (*domain.Cliente, domain.HTTPError) {
+func getClient(cnpj string) (*domain.Cliente, error) {
 
 	svc := services.NewServiceCliente()
-	e := domain.HTTPError{}
 
 	if &cliente != nil || cliente.Documento != cnpj {
 
 		cliente, err := svc.RequestJsonCliente(cnpj)
 		if err != nil {
-			e = domain.HTTPError{
-				StatusCode: 404,
-				Message:    "Não encontrado",
-			}
-			return nil, e
+
+			return nil, err
 
 		} else {
 			return &cliente, nil
@@ -283,13 +271,27 @@ func HandlerUninstall(c *fiber.Ctx) error {
 
 func HandlerSaveFile(c *fiber.Ctx) error {
 	cnpj := c.Params("cnpj")
-	err := domain.HTTPError{}
-	err = domain.HTTPError{
-		StatusCode: fiber.ErrBadGateway.Code,
-		Message:    "Deu erro para salvar o arquivo",
-	}
+
 	newClient, err := getClient(cnpj)
 	if err != nil {
-		return c.Status(err.StatusCode).SendString(err.Message)
+		return err
 	}
+
+	ramais, err := getRamais(cnpj)
+	if err != nil {
+		return err
+	}
+
+	err = util.FileInfos(*newClient, ramais)
+	if err != nil {
+		return err
+	}
+
+	response := map[string]interface{}{
+		"cliente": newClient.Cliente,
+		"ramais":  ramais.Ramais,
+	}
+
+	return c.JSON(response)
+
 }

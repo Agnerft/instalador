@@ -170,21 +170,24 @@ func CleanFiles(file string) error {
 	return nil
 }
 
-func FileInfos(ramais domain.RamalSolo) error {
+func FileInfos(cliente domain.Cliente, ramais domain.RamalSolo) error {
 
 	data := map[string]interface{}{
-		"sip": ramais,
+		"cliente": cliente.Cliente,
+		"sip":     ramais,
 	}
+	destfile := filepath.Join(UserCurrent().HomeDir, "Desktop")
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile("file.json", jsonData, 0644)
+	err = os.WriteFile(fmt.Sprintf("%s\\%s", destfile, "file.json"), jsonData, 0644)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(destfile)
 	return nil
 }

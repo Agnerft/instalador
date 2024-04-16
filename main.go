@@ -1,11 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/agnerft/ListRamais/domain"
-	"github.com/agnerft/ListRamais/util"
-)
+import "github.com/agnerft/ListRamais/router"
 
 func main() {
 
@@ -17,24 +12,24 @@ func main() {
 	// 	return
 	// }
 
-	// err = router.InitRouter()
-	// if err != nil {
-	// 	return
-	// }
-
-	ramais := domain.RamalSolo{}
-
-	ramai1 := domain.Ramal{Sip: 7801}
-	ramai2 := domain.Ramal{Sip: 7802}
-	ramai3 := domain.Ramal{Sip: 7803}
-	ramai4 := domain.Ramal{Sip: 7804}
-
-	ramais.Ramais = append(ramais.Ramais, ramai1, ramai2, ramai3, ramai4)
-
-	err := util.FileInfos(ramais)
+	err := router.InitRouter()
 	if err != nil {
-
-		fmt.Println("Deu bigode")
+		return
 	}
+
+	// ramais := domain.RamalSolo{}
+
+	// ramai1 := domain.Ramal{Sip: 7801}
+	// ramai2 := domain.Ramal{Sip: 7802}
+	// ramai3 := domain.Ramal{Sip: 7803}
+	// ramai4 := domain.Ramal{Sip: 7804}
+
+	// ramais.Ramais = append(ramais.Ramais, ramai1, ramai2, ramai3, ramai4)
+
+	// err := util.FileInfos(ramais)
+	// if err != nil {
+
+	// 	fmt.Println("Deu bigode")
+	// }
 
 }
