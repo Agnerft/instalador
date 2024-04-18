@@ -1,6 +1,10 @@
 package main
 
-import "github.com/agnerft/ListRamais/router"
+import (
+	"fmt"
+
+	"github.com/agnerft/ListRamais/services"
+)
 
 func main() {
 
@@ -12,24 +16,23 @@ func main() {
 	// 	return
 	// }
 
-	err := router.InitRouter()
+	// err := router.InitRouter()
+	// if err != nil {
+	// 	return
+	// }
+
+	// var svc services.ServiceRequest
+
+	url := "http://msb2b.gvctelecom.com.br:1127"
+
+	obj, err := services.NewServiceCliente().Encapsule(url)
 	if err != nil {
-		return
+		fmt.Println("Deu bigode")
 	}
 
-	// ramais := domain.RamalSolo{}
+	for i := range obj {
 
-	// ramai1 := domain.Ramal{Sip: 7801}
-	// ramai2 := domain.Ramal{Sip: 7802}
-	// ramai3 := domain.Ramal{Sip: 7803}
-	// ramai4 := domain.Ramal{Sip: 7804}
-
-	// ramais.Ramais = append(ramais.Ramais, ramai1, ramai2, ramai3, ramai4)
-
-	// err := util.FileInfos(ramais)
-	// if err != nil {
-
-	// 	fmt.Println("Deu bigode")
-	// }
+		fmt.Println(obj[i])
+	}
 
 }

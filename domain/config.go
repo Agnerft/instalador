@@ -27,8 +27,6 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		// Account:             "Account",
-		// Label:
 		HideCID:             0,
 		RegisterRefresh:     300,
 		KeepAlive:           15,
@@ -38,16 +36,3 @@ func NewConfig() *Config {
 		DisableSessionTimer: 0,
 	}
 }
-
-// func IntanceConfig() *Config {
-// 	return &Config{
-
-// 		HideCID:             0,
-// 		RegisterRefresh:     300,
-// 		KeepAlive:           15,
-// 		Publish:             0,
-// 		ICE:                 0,
-// 		AllowRewrite:        0,
-// 		DisableSessionTimer: 0,
-// 	}
-// }

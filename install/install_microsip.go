@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/agnerft/ListRamais/domain"
@@ -12,7 +11,7 @@ import (
 	"github.com/agnerft/ListRamais/util"
 )
 
-func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string) (string, error) {
+func InstallMicrosip(cliente *domain.Cliente, ramal domain.ObjetoGvc, account string) (string, error) {
 	duration := 5 * time.Second
 	var err error
 	// var destDeleleteMicroSIP = filepath.Join(util.UserCurrent().HomeDir, "AppData", "Local", "MicroSIP", "Uninstall.exe")
@@ -110,15 +109,15 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	fmt.Println(ini.UpdateBatchSection(set, mpConfigSettings))
 
 	cfg := domain.NewConfig()
-	ramalString := strconv.Itoa(ramal.Sip)
+	// ramalString := strconv.Itoa(ramal.NameUsername)
 
-	cfg.Label = ramalString
+	cfg.Label = ramal.NameUsername
 	cfg.Server = cliente.Link_sip
 	cfg.Proxy = cliente.Link_sip
 	cfg.Domain = cliente.Link_sip
-	cfg.Username = ramalString
-	cfg.Password = fmt.Sprintf("%s%s", ramalString, "@abc")
-	cfg.AuthID = ramalString
+	cfg.Username = ramal.NameUsername
+	cfg.Password = fmt.Sprintf("%s%s", ramal.NameUsername, "@abc")
+	cfg.AuthID = ramal.NameUsername
 
 	// fmt.Println(*cfg)
 
@@ -150,5 +149,5 @@ func InstallMicrosip(cliente *domain.Cliente, ramal domain.Ramal, account string
 	// 	return "", err
 	// }
 
-	return fmt.Sprintf("Instalado MicroSIP com o ramal %s", ramalString), nil
+	return fmt.Sprintf("Instalado MicroSIP com o ramal %s", ramal.NameUsername), nil
 }

@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/agnerft/ListRamais/domain"
 	"github.com/agnerft/ListRamais/install"
@@ -134,7 +133,7 @@ func HandlerInstall(c *fiber.Ctx) error {
 	svc := services.NewServiceCliente()
 	cnpj := c.Params("cnpj")
 	ramalParam := c.Params("ramal")
-	ramalParamInt, _ := strconv.Atoi(ramalParam)
+	ramalParamInt := ramalParam
 	acc := c.Params("acc")
 
 	newCliente, err := getClient(cnpj)
@@ -142,21 +141,21 @@ func HandlerInstall(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	newRamais, err := svc.PostRamais(fmt.Sprintf("%s/%s", newCliente.Link, "asterisk_exec"))
+	newRamais, err := svc.Encapsule(fmt.Sprintf("%s/%s", newCliente.Link, "asterisk_exec"))
 	if err != nil {
 		return err
 	}
 
-	var ramalAtual domain.Ramal
+	var ramalAtual domain.ObjetoGvc
 
-	for _, ramal := range newRamais.Ramais {
+	for _, ramal := range newRamais {
 
-		if ramal.Sip == ramalParamInt {
+		if ramal.NameUsername == ramalParamInt {
 			fmt.Println(ramal)
 			// fmt.Println(ramalAtual.Ramais)
 			// ramalAtual.Ramais = append(ramalAtual.Ramais, ramal)
 
-			ramalAtual = ramal
+			ramalAtual.NameUsername = ramal.NameUsername
 
 			break
 		}
@@ -173,7 +172,7 @@ func HandlerInstall(c *fiber.Ctx) error {
 	response = map[string]interface{}{
 		"cliente": newCliente.Cliente,
 		"doc":     newCliente.Documento,
-		"ramal":   ramalAtual.Sip,
+		"ramal":   ramalAtual.NameUsername,
 		"status":  exist,
 	}
 	fmt.Println(r)
