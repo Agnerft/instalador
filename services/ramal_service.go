@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/agnerft/ListRamais/domain"
@@ -11,36 +12,48 @@ import (
 
 func (s *ServiceRequest) Encapsule(url string) ([]domain.ObjetoGvc, error) {
 
-	// url := "http://umusul.gvctelecom.com.br:1135"
-
-	bod, err := s.ObjGVC(fmt.Sprintf("%s/%s", url, "asterisk_exec"))
+	body, err := s.ObjGVC(fmt.Sprintf("%s/%s", url, "asterisk_exec"))
 	if err != nil {
 		fmt.Println("Deu bigode")
 	}
-
+	var worldReal string
 	Objs := make([]domain.ObjetoGvc, 0)
+	var objGVC domain.ObjetoGvc
+	reInt := regexp.MustCompile(`[0-9]`)
+	reStg := regexp.MustCompile(`(.*)\\/(.*)`)
 
-	camposCabecalho := strings.Fields(bod[0])
-	// indiceDescricao := len(camposCabecalho) - 1
+	for i, s := range body {
 
-	for i, s := range bod {
+		if strings.Contains(s, "peers") {
+			break
+		}
 
 		if !strings.Contains(s, "peers") && i != 0 {
-			words := strings.Fields(bod[i])
 
-			if len(words) != len(camposCabecalho) {
-				continue
+			words := strings.Fields(body[i])
+			matches := reStg.FindAllStringSubmatch(words[0], -1)
+			quant := reInt.FindAllString(words[0], -1)
+
+			for _, match := range matches {
+
+				if match[1] == match[2] && len(quant) == 8 {
+					worldReal = match[2]
+				}
+
+				worldlimpa := strings.Split(words[0], "\\/")
+				worldlimpa = strings.Split(worldlimpa[0], `"`)
+				worldlimpa = strings.Split(worldlimpa[1], " ")
+
+				worldReal = worldlimpa[0]
 			}
 
-			indexBarra := strings.Index(words[0], "\\/")
-			if indexBarra != -1 {
-				words[0] = words[0][:indexBarra]
+			if words[6] == "UNKNOWN" {
+				fmt.Println("banana")
 			}
 
-			// fmt.Printf("%s -> linha %d \n", words, i)
-			obj := domain.ObjetoGvc{
-				// NameUsername: strings.ReplaceAll(words[0], `"`, ""),
-				NameUsername: words[0],
+			objGVC = domain.ObjetoGvc{
+
+				NameUsername: worldReal,
 				Host:         words[1],
 				Dyn:          words[2],
 				Forcerport:   words[3],
@@ -51,13 +64,10 @@ func (s *ServiceRequest) Encapsule(url string) ([]domain.ObjetoGvc, error) {
 				// Description:  strings.Join(words[8:indiceDescricao], ""),
 			}
 
-			Objs = append(Objs, obj)
-			// fmt.Println(Objs)
+			Objs = append(Objs, objGVC)
 		}
 
 	}
-
-	// fmt.Println(Objs)
 
 	return Objs, nil
 }
